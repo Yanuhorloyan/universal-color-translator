@@ -9,7 +9,7 @@ function App() {
   const convertHandler = (event) => {
     event.preventDefault();
 
-    const style = new Option().style;
+    const style = new Option().style;;
     style.color = colorName;
 
     if (!style.color) {
