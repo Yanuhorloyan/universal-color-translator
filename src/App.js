@@ -1,50 +1,58 @@
-import React, { useRef, useState } from 'react';
-import './App.css';
+import { useRef, useState } from 'react'
+import colorDictionary from './utils/colorDictionary'
+import './App.css'
 
 function App() {
-  const [colorName, setColorName] = useState('');
-  const [colorHexCode, setColorHexCode] = useState('#FFFFFF');
-  const canvasRef = useRef(null);
+  const [colorName, setColorName] = useState('')
+  const [colorHexCode, setColorHexCode] = useState('#FFFFFF')
+  const [showError, setShowError] = useState(false)
+  const colorBoxRef = useRef(null)
 
   const convertHandler = (event) => {
-    event.preventDefault();
+    event.preventDefault()
+    const userInput = colorName.trim().toLowerCase()
+    const hexCode = colorDictionary[userInput]
 
-    const style = new Option().style;;
-    style.color = colorName;
-
-    if (!style.color) {
-      alert('Please enter a valid color name.');
-      return;
+    if (!hexCode) {
+      setShowError(true)
+      return
     }
 
-    const canvasElement = canvasRef.current;
-    const context = canvasElement.getContext('2d');
-    context.fillStyle = colorName;
-    context.fillRect(0, 0, canvasElement.width, canvasElement.height);
-    setColorHexCode((context.fillStyle).toUpperCase());
-  };
+    setColorHexCode(hexCode)
+    if (colorBoxRef.current) colorBoxRef.current.style.backgroundColor = hexCode
+  }
 
   return (
-    <div className='App'>
+    <>
+      <h1>Universal Color Translator</h1>
 
-      <div className='output'>
-        <canvas ref={canvasRef} />
-        <span>{colorHexCode}</span>  
+      <div className="box">
+        <div className='color_box' ref={colorBoxRef}></div>
+        <div className='hex_code' data-testid='hexCode'>{colorHexCode}</div>
       </div>
 
-      <div>
+      <div className="controls">
         <form onSubmit={(e) => convertHandler(e)}>
-          <input
-            placeholder='Enter color name...'
-            value={colorName}
-            onChange={(e) => setColorName(e.target.value)}
-          />
-          <button type='submit'>convert</button>
+          <div className='input_container'>
+            <input
+              onChange={(e) => {
+                setColorName(e.target.value)
+                setShowError(false)
+              }}
+              placeholder='Enter color name...'
+              type='text'
+              value={colorName}
+            />
+            {colorName && <span className='clear' onClick={() => setColorName('')}>X</span>}
+          </div>
+          <button type='submit'>
+            convert
+          </button>
         </form>
+        <div className='invalid'>{showError ? '**Please enter a valid color name**' : ''}</div>
       </div>
-
-    </div>
-  );
+    </>
+  )
 }
 
-export default App;
+export default App
